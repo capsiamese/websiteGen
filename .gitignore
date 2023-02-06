@@ -1,3 +1,4 @@
 gen/output/*
 gen/input
-build.exe
+gen/build.exe
+.idea
