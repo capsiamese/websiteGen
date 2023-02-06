@@ -1,0 +1,3 @@
+gen/output/*
+gen/input
+build.exe

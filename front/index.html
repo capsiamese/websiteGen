@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="True" name="HandheldFriendly">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>siamese</title>
+
+    <link href="https://unpkg.com/nes.css@latest/css/nes.min.css" rel="stylesheet"/>
+    <!--
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css">
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/highlight.min.js"></script>
+    -->
+
+    <link type="text/css" rel="stylesheet" href="style.css">
+
+    <script>
+        /*Gtag*/
+    </script>
+</head>
+<body>
+
+<video playsinline muted loop autoplay class="bg-video">
+    <source src="bg.webm" type="video/webm">
+</video>
+
+<div class="fg">
+    <div class="main">
+        <div class="nes-container is-rounded is-dark banner">
+            <img src="siamese-pixel.png" alt="siamese" class="site-img">
+            <div>
+                <div class="site-title">
+                    <b>Space Siamese Cat</b>
+                </div>
+                <div class="lists">
+                    <ul class="nes-list is-disc">
+                        <!--Info Start-->
+
+                        <li><a href="https://www.google.com" target="_blank">Home</a></li>
+                        <li><a href="https://www.google.com" target="_blank">About</a></li>
+                        <li><a href="https://www.google.com" target="_blank">References</a></li>
+
+                        <!--Info End-->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="content nes-container is-rounded is-dark">
+            <!--Content Start-->
+
+            <div class="item">
+                <p>Jul 21, 2022</p>
+                <p>
+                    <a href="https://www.google.com">Hello World Title</a>
+                </p>
+            </div>
+
+            <div>
+                <p>Feb 32, 2023</p>
+                <p>
+                    <a href="https://www.google.com">中文像素测试</a>
+                </p>
+            </div>
+
+            <!--Content End-->
+        </div>
+    </div>
+    <hr>
+    <footer>
+        © 2023 Powered by qinzhe and
+        <i class="nes-icon is-small heart"></i>
+        <a href="https://github.com/capsiamese" target="_blank" style="color: white">
+            Find Me
+            <i class="nes-icon github is-small"></i>
+        </a>
+    </footer>
+    <button id="go-top" type="button" class="nes-btn is-error go-top-btn" onclick="goTop()"><span><</span></button>
+</div>
+
+<script>
+    //hljs.highlightAll();
+
+    function goTop() {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    document.addEventListener('scroll', () => {
+        let btn = document.getElementById('go-top')
+        if (btn) {
+            let n = document.documentElement.scrollTop || document.body.scrollTop;
+            //console.log(n);
+            if (n > 500) {
+                btn.className = "nes-btn is-error go-top-btn active";
+            } else {
+                btn.className = "nes-btn is-error go-top-btn";
+            }
+        }
+    })
+</script>
+
+</body>
+</html>
