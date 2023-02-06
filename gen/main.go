@@ -50,6 +50,9 @@ const (
 )
 
 func newDraft(target string) {
+	if err := os.MkdirAll(path.Dir(target), 0644); err != nil {
+		log.Fatalln("[fatal]", err)
+	}
 	f, err := os.OpenFile(target, openMode, 0644)
 	if err != nil {
 		log.Fatalln("[fatal]", err)
