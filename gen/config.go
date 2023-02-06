@@ -2,6 +2,7 @@ package main
 
 import (
 	"gopkg.in/yaml.v3"
+	"log"
 	"os"
 )
 
@@ -30,5 +31,28 @@ func ParseConfig() {
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
 		panic(err)
+	}
+}
+
+func newConfig(out string) {
+	c := Config{
+		InputDir:        "./input",
+		OutputDir:       "./output",
+		GoogleAnalytics: "",
+		BaseURL:         "https://localhost",
+		PostFolder:      "posts",
+		Method:          "local",
+		RemoteAddr:      "localhost:22",
+		User:            "admin",
+		KeyPath:         "~/.ssh/id_rsa",
+		Password:        "stdin",
+	}
+	data, err := yaml.Marshal(c)
+	if err != nil {
+		log.Fatalln("[error] marshal config", err)
+	}
+	err = os.WriteFile(out, data, 0644)
+	if err != nil {
+		log.Fatalln("[error] write config to", out, err)
 	}
 }

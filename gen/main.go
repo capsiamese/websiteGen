@@ -66,8 +66,14 @@ func newDraft(target string) {
 
 func main() {
 	if len(os.Args) == 3 && os.Args[1] == "new" {
-		newDraft(os.Args[2])
-		return
+		if os.Args[1] == "new" {
+			newDraft(os.Args[2])
+			return
+		}
+		if os.Args[1] == "gen" {
+			newConfig(os.Args[2])
+			return
+		}
 	}
 
 	ParseConfig()
