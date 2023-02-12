@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	if err := cgi.Serve((*Handler)(nil)); err != nil {
+	if err := cgi.Serve(Handler{}); err != nil {
 		fmt.Print("Content-type:", mime.TypeByExtension(".html"), "\n\n")
 		fmt.Println("<h1>", err, "</h1>")
 	}

@@ -1,0 +1,16 @@
+{{ define "content" }}
+    <div class="nes-container is-rounded is-dark with-title" style="border-radius: 10px;">
+        <p class="title">{{ .Post.Meta.Title }}</p>
+        <!--Content Start-->
+        {{- if .Post.Meta.UseStyle }}
+        <div id="main-text">
+            {{ else }}
+            <div style="font-family: auto,monospace" id="main-text">
+                {{- end }}
+                {{- .Post.HTML -}}
+            </div>
+            <!--Content End-->
+            <p class="nes-balloon from-left nes-pointer" style="color: black">{{ .Post.Meta.Date.Format "Jan _2, 2006" }}</p>
+        </div>
+    </div>
+{{end}}

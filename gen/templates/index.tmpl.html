@@ -1,0 +1,12 @@
+{{ define "index" }}
+    <div class="nes-container is-rounded is-dark" style="border-radius: 10px;">
+        <!--Content Start-->
+        {{- range .Site.Posts }}
+            <div class="item">
+                <p>{{ .Meta.Date.Format "Jan _2, 2006" }}</p>
+                <p><a href="{{ .URL }}" target="_self">{{ .Meta.Title }}</a></p>
+            </div>
+        {{- end }}
+        <!--Content End-->
+    </div>
+{{ end }}

@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
-	"golang.org/x/term"
 	"io"
 	"log"
+	"mdgen/gui"
 	"os"
-	"strings"
-	"syscall"
 )
+
+// term.ReadPassword(int(syscall.Stdin))
 
 type FileWriter interface {
 	Open(name string) (io.WriteCloser, error)
@@ -44,40 +44,31 @@ func NewRemoteWriter() *RemoteWriter {
 	return &RemoteWriter{}
 }
 
-func tryAuthMethod() []ssh.AuthMethod {
-	data, keyPathErr := os.ReadFile(config.KeyPath)
+func (rw *RemoteWriter) tryAuthMethod(keyPath, password string) []ssh.AuthMethod {
+	data, keyPathErr := os.ReadFile(keyPath)
 	if keyPathErr != nil {
-		log.Println("[warning] read ssh key from", config.KeyPath, keyPathErr)
+		log.Println("[warning] read ssh key from", keyPath, keyPathErr)
 	} else {
 		signer, parseKeyErr := ssh.ParsePrivateKey(data)
 		if parseKeyErr != nil {
-			log.Println("[warning] parse ssh key", config.KeyPath, parseKeyErr)
+			log.Println("[warning] parse ssh key", keyPath, parseKeyErr)
 		} else {
 			return []ssh.AuthMethod{ssh.PublicKeys(signer)}
 		}
 	}
 	return []ssh.AuthMethod{ssh.PasswordCallback(func() (secret string, err error) {
-		if config.Password == "stdin" {
-			fmt.Printf("%s@%s's password:", config.User, config.RemoteAddr)
-			sec, err := term.ReadPassword(int(syscall.Stdin))
-			if err != nil {
-				return "", err
-			}
-			return strings.TrimSpace(string(sec)), nil
-		} else if s, ok := os.LookupEnv(config.Password); ok {
-			return s, nil
-		}
-		return "", fmt.Errorf("config password must be stdin or env key")
+		return password, nil
 	})}
 }
 
-func (rw *RemoteWriter) Connect() error {
+func (rw *RemoteWriter) Connect(d *gui.Data) error {
 	var cfg ssh.ClientConfig
-	cfg.Auth = tryAuthMethod()
-	cfg.User = config.User
+	cfg.Auth = rw.tryAuthMethod(d.KeyFile, d.Password)
+	cfg.User = d.User
 	cfg.HostKeyCallback = ssh.InsecureIgnoreHostKey()
 
-	sshClient, err := ssh.Dial("tcp", config.RemoteAddr, &cfg)
+	addr := fmt.Sprintf("%s:%s", d.RemoteAddr, d.RemotePort)
+	sshClient, err := ssh.Dial("tcp", addr, &cfg)
 	if err != nil {
 		return err
 	}
