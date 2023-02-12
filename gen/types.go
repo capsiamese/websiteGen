@@ -46,14 +46,14 @@ func (si *SiteInfo) IsBannerPost(fileName string) bool {
 
 func (si *SiteInfo) AddTotal(n int) {
 	si.total += n
-	if si.total != 0 {
+	if si.total != 0 && si.ProgressChange != nil {
 		si.ProgressChange(int(float32(si.complete/si.total) * 100))
 	}
 }
 
 func (si *SiteInfo) AddComplete(n int) {
 	si.complete += n
-	if si.total != 0 {
+	if si.total != 0 && si.ProgressChange != nil {
 		si.ProgressChange(int(float32(si.complete/si.total) * 100))
 	}
 }

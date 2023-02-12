@@ -6,6 +6,7 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/alecthomas/chroma/v2 v2.2.0
 	github.com/andlabs/ui v0.0.0-20200610043537-70a69d6ae31e
+	github.com/caarlos0/env/v7 v7.0.0
 	github.com/mozillazg/go-pinyin v0.19.0
 	github.com/pkg/sftp v1.13.5
 	github.com/sqweek/dialog v0.0.0-20220809060634-e981b270ebbf

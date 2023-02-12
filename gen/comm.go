@@ -2,10 +2,8 @@ package main
 
 import (
 	"embed"
-	_ "embed"
 	"fmt"
 	"github.com/Masterminds/sprig"
-	"github.com/andlabs/ui"
 	"html/template"
 	"mdgen/gui"
 	"os"
@@ -28,7 +26,7 @@ var (
 	htmlTemplates *template.Template
 )
 
-func IniTemplate() {
+func init() {
 	htmlTemplates = template.Must(
 		template.New("").
 			Funcs(sprig.FuncMap()).
@@ -55,32 +53,6 @@ func GetAsset(name string) any {
 const (
 	openMode = os.O_TRUNC | os.O_CREATE | os.O_RDWR
 )
-
-func main() {
-	IniTemplate()
-
-	app := gui.NewGUI()
-	app.ReadCache()
-
-	app.OnStartBtnClicked(func(button *ui.Button) {
-		button.Disable()
-		app.SetProgress(0)
-
-		generate(app.Data(), app.SetProgress, func(err error) {})
-		app.WriteCache()
-
-		app.Done()
-	})
-
-	app.SetupF(func() {
-
-	})
-
-	err := app.Run()
-	if err != nil {
-		fmt.Println("----", err, "----")
-	}
-}
 
 func generate(data *gui.Data, change func(int), onErr func(error)) {
 	if data.Remote {

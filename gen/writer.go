@@ -53,7 +53,15 @@ func NewRemoteWriter() *RemoteWriter {
 	return &RemoteWriter{}
 }
 
-func (rw *RemoteWriter) tryAuthMethod(keyPath, password string) []ssh.AuthMethod {
+func (rw *RemoteWriter) tryAuthMethod(keyStr, keyPath, password string) []ssh.AuthMethod {
+	if keyStr != "" {
+		signer, parseKeyErr := ssh.ParsePrivateKey([]byte(keyStr))
+		if parseKeyErr != nil {
+			log.Println("[warning] read ssh key from", keyPath, parseKeyErr)
+		} else {
+			return []ssh.AuthMethod{ssh.PublicKeys(signer)}
+		}
+	}
 	data, keyPathErr := os.ReadFile(keyPath)
 	if keyPathErr != nil {
 		log.Println("[warning] read ssh key from", keyPath, keyPathErr)
@@ -72,7 +80,7 @@ func (rw *RemoteWriter) tryAuthMethod(keyPath, password string) []ssh.AuthMethod
 
 func (rw *RemoteWriter) Connect(d *gui.Data) error {
 	var cfg ssh.ClientConfig
-	cfg.Auth = rw.tryAuthMethod(d.KeyFile, d.Password)
+	cfg.Auth = rw.tryAuthMethod(d.KeyStr, d.KeyFile, d.Password)
 	cfg.User = d.User
 	cfg.HostKeyCallback = ssh.InsecureIgnoreHostKey()
 

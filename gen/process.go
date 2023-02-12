@@ -34,6 +34,8 @@ func (si *SiteInfo) ScanPostDir() error {
 			if err != nil {
 				si.OnErr(fmt.Errorf("get post %s %v", fileName, err))
 				continue
+			} else if post.Meta.Draft {
+				continue
 			} else {
 				si.AddTotal(1)
 				if si.IsBannerPost(fileName) {
