@@ -22,15 +22,6 @@ var templates embed.FS
 //go:embed static
 var static embed.FS
 
-/*
-TODO:
-*/
-var (
-	assetsDir   string = "./assets"
-	templateDir string = "./templates"
-	staticDir   string = "./statics"
-)
-
 var (
 	markdown      = NewMarkDown()
 	writer        FileWriter
@@ -49,13 +40,16 @@ func IniTemplate() {
 }
 
 func GetAsset(name string) any {
-	if path.Ext(name) == ".js" {
-		data, _ := assetsFS.ReadFile("assets/" + name)
+	fn := path.Join("assets", name)
+	switch path.Ext(name) {
+	case ".js":
+		data, _ := assetsFS.ReadFile(fn)
 		return template.JS(data)
-	} else {
-		data, _ := assetsFS.ReadFile("assets/" + name)
+	case ".css":
+		data, _ := assetsFS.ReadFile(fn)
 		return template.CSS(data)
 	}
+	return nil
 }
 
 const (
@@ -66,12 +60,14 @@ func main() {
 	IniTemplate()
 
 	app := gui.NewGUI()
+	app.ReadCache()
 
 	app.OnStartBtnClicked(func(button *ui.Button) {
 		button.Disable()
 		app.SetProgress(0)
 
 		generate(app.Data(), app.SetProgress, func(err error) {})
+		app.WriteCache()
 
 		app.Done()
 	})
@@ -108,8 +104,10 @@ func generate(data *gui.Data, change func(int), onErr func(error)) {
 			{URL: "/about.html", Target: "_self", Name: "About", FileName: "about.md"},
 			{URL: "/ref.html", Target: "_blank", Name: "Ref", FileName: "ref.md"},
 		},
-		ProgressChange: change,
-		OnErr:          onErr,
+		ProgressChange:    change,
+		OnErr:             onErr,
+		IndexTemplateName: "blueprint",
+		PostTemplateName:  "blueprint",
 	}
 
 	step := []func() error{

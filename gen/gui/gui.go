@@ -14,6 +14,8 @@ type Data struct {
 	BaseURL          string
 	OutputPostFolder string
 
+	Clean bool // todo: impl clean dir
+
 	RemoteAddr string
 	RemotePort string
 	User       string
@@ -68,12 +70,12 @@ func (a *App) setup() {
 	vBox.Append(a.formComponent(), false)
 	vBox.Append(ui.NewVerticalSeparator(), false)
 
-	vBox.Append(a.pickerComponent("选择输入目录", "选择输入目录", false, func(folder string) {
+	vBox.Append(a.pickerComponent("选择输入目录", "选择输入目录", a.data.InputFolder, false, func(folder string) {
 		a.data.InputFolder = folder
 	}), false)
 	vBox.Append(ui.NewVerticalSeparator(), false)
 
-	vBox.Append(a.pickerComponent("选择输出目录", "选择输出目录", false, func(folder string) {
+	vBox.Append(a.pickerComponent("选择输出目录", "选择输出目录", a.data.OutputFolder, false, func(folder string) {
 		a.data.OutputFolder = folder
 	}), false)
 	vBox.Append(ui.NewVerticalSeparator(), false)

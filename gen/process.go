@@ -6,11 +6,11 @@ import (
 	"github.com/mozillazg/go-pinyin"
 	meta "github.com/yuin/goldmark-meta"
 	"github.com/yuin/goldmark/parser"
+	"gopkg.in/yaml.v3"
 	"html/template"
 	"os"
 	"path"
 	"strings"
-	"time"
 )
 
 func (si *SiteInfo) Error(format string, args ...any) {
@@ -65,7 +65,7 @@ func GetPost(dir, name string, info os.DirEntry) (*Post, error) {
 	if i, err := info.Info(); err != nil {
 		return nil, err
 	} else {
-		post.FileInfo = i
+		post.fileInfo = i
 	}
 
 	data, err := os.ReadFile(path.Join(dir, name))
@@ -80,6 +80,7 @@ func GetPost(dir, name string, info os.DirEntry) (*Post, error) {
 		return nil, err
 	}
 
+	post.ctx = meta.Get(ctx)
 	SetMeta(ctx, &post.Meta)
 
 	post.HTML = template.HTML(buf.String())
@@ -103,12 +104,17 @@ func TrimExt(name string) string {
 }
 
 func SetMeta(ctx parser.Context, postMeta *PostMeta) {
-	m := meta.Get(ctx)
-	t, err := time.Parse(time.RFC3339, m["date"].(string))
+	// todo: handle error
+	data, err := yaml.Marshal(meta.Get(ctx))
 	if err != nil {
-
+		fmt.Println(err)
+		return
 	}
-	postMeta.Date = t
+	err = yaml.Unmarshal(data, postMeta)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }
 
 func (si *SiteInfo) GenerateIndex() error {
@@ -122,7 +128,7 @@ func (si *SiteInfo) GenerateIndex() error {
 		return err
 	}
 	defer file.Close()
-	err = htmlTemplates.ExecuteTemplate(file, "blueprint", map[string]any{
+	err = htmlTemplates.ExecuteTemplate(file, si.IndexTemplateName, map[string]any{
 		"Site":  si,
 		"Index": true,
 	})
@@ -139,14 +145,21 @@ func (si *SiteInfo) GeneratePosts() error {
 		return err
 	}
 
-	gen := func(dir string, s *SiteInfo, p *Post) error {
-		file, err := writer.Open(path.Join(prefix, p.OutputName))
+	gen := func(filePath string, s *SiteInfo, p *Post) error {
+		outputFileStat, err := writer.Stat(filePath)
+		if err != nil {
+			// todo: handle error
+		} else if p.fileInfo.ModTime().Before(outputFileStat.ModTime()) {
+			return nil
+		}
+
+		file, err := writer.Open(filePath)
 		if err != nil {
 			return err
 		}
 		defer file.Close()
 
-		err = htmlTemplates.ExecuteTemplate(file, "blueprint", map[string]any{
+		err = htmlTemplates.ExecuteTemplate(file, si.PostTemplateName, map[string]any{
 			"Site": s,
 			"Post": p,
 		})
@@ -164,7 +177,7 @@ func (si *SiteInfo) GeneratePosts() error {
 		si.AddComplete(1)
 	}
 	for _, v := range si.BannerPost {
-		err := gen(path.Join(si.Conf.OutputFolder, v.FileName), si, v)
+		err := gen(path.Join(si.Conf.OutputFolder, v.OutputName), si, v)
 		if err != nil {
 			si.Error("gen post %s %v", v.OutputName, err)
 		}
@@ -179,7 +192,7 @@ func (si *SiteInfo) WriteStatics() error {
 		return err
 	}
 	for _, v := range entries {
-		data, _ := static.ReadFile("static/" + v.Name())
+		data, _ := static.ReadFile(path.Join("static", v.Name()))
 		file, err := writer.Open(path.Join(si.Conf.OutputFolder, v.Name()))
 		if err != nil {
 			si.Error("gen post %s %v", v.Name(), err)

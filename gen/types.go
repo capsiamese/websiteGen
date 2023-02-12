@@ -1,15 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"github.com/alecthomas/chroma/v2/formatters/html"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	meta "github.com/yuin/goldmark-meta"
 	"go.abhg.dev/goldmark/mermaid"
 	"html/template"
+	"io/fs"
 	"mdgen/gui"
-	"os"
 	"sort"
 	"time"
 )
@@ -22,6 +21,9 @@ type SiteInfo struct {
 	BannerItems     []BannerItem
 	BannerPost      []*Post
 	Conf            *gui.Data
+
+	IndexTemplateName string
+	PostTemplateName  string
 
 	complete       int
 	total          int
@@ -68,15 +70,20 @@ type Post struct {
 	URL        template.URL
 	HTML       template.HTML
 	Meta       PostMeta
-	FileInfo   os.FileInfo
+	ctx        map[string]any
+	fileInfo   fs.FileInfo
+}
+
+func (p *Post) Get(k string) any {
+	return p.ctx[k]
 }
 
 type PostMeta struct {
-	UseStyle bool
-	Title    string
-	Tags     []string
-	Date     time.Time
-	Draft    bool
+	UseStyle bool      `yaml:"styled"`
+	Title    string    `yaml:"title"`
+	Tags     []string  `yaml:"tags"`
+	Date     time.Time `yaml:"date"`
+	Draft    bool      `yaml:"draft"`
 
 	Private bool
 }
@@ -97,15 +104,6 @@ func OneOf[T comparable](src T, oneOf ...T) bool {
 	return false
 }
 
-func Get[T any](m map[string]any, key string) (T, error) {
-	v := m[key]
-	r, ok := v.(T)
-	if !ok {
-		return r, fmt.Errorf("value of key %s is not %T", key, v)
-	}
-	return r, nil
-}
-
 func NewMarkDown() goldmark.Markdown {
 	return goldmark.New(
 		goldmark.WithExtensions(
@@ -121,10 +119,5 @@ func NewMarkDown() goldmark.Markdown {
 	)
 }
 
-func OrDefault[T comparable](v T, d T) T {
-	var x T
-	if v == x {
-		return d
-	}
-	return v
+func (si *SiteInfo) CleanOutput() {
 }

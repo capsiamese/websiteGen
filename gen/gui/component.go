@@ -12,9 +12,9 @@ import (
 	"time"
 )
 
-func (a *App) pickerComponent(btnName, pickerTitle string, file bool, recv func(folder string)) ui.Control {
+func (a *App) pickerComponent(btnName, pickerTitle, pickerTxt string, file bool, recv func(folder string)) ui.Control {
 	h := ui.NewHorizontalBox()
-	label := ui.NewLabel("")
+	label := ui.NewLabel(pickerTxt)
 	btn := ui.NewButton(btnName)
 	btn.OnClicked(func(button *ui.Button) {
 		var pth string
@@ -43,12 +43,17 @@ func (a *App) pickerComponent(btnName, pickerTitle string, file bool, recv func(
 	return h
 }
 
-func (a *App) targetSelector() ui.Control {
+func (a *App) targetSelector(remote bool) ui.Control {
 	rb := ui.NewRadioButtons()
 	rb.Append("local")
 	rb.Append("remote")
-	rb.SetSelected(0)
-	a.hideRemote(true)
+	if remote {
+		rb.SetSelected(1)
+		a.hideRemote(false)
+	} else {
+		rb.SetSelected(0)
+		a.hideRemote(true)
+	}
 	rb.OnSelected(func(buttons *ui.RadioButtons) {
 		switch buttons.Selected() {
 		case 0:
@@ -62,6 +67,7 @@ func (a *App) targetSelector() ui.Control {
 
 func EntryStr(v *string) ui.Control {
 	entry := ui.NewEntry()
+	entry.SetText(*v)
 	entry.OnChanged(func(entry *ui.Entry) {
 		*v = entry.Text()
 	})
@@ -71,7 +77,7 @@ func EntryStr(v *string) ui.Control {
 func (a *App) formComponent() ui.Control {
 	form := ui.NewForm()
 	form.SetPadded(true)
-	form.Append("选择输出模式", a.targetSelector(), false)
+	form.Append("选择输出模式", a.targetSelector(a.data.Remote), false)
 
 	form.Append("GoogleAnalytics", EntryStr(&a.data.GoogleAnalytics), false)
 	form.Append("BaseURL", EntryStr(&a.data.BaseURL), false)

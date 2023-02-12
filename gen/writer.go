@@ -5,6 +5,7 @@ import (
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 	"io"
+	"io/fs"
 	"log"
 	"mdgen/gui"
 	"os"
@@ -12,11 +13,15 @@ import (
 
 // term.ReadPassword(int(syscall.Stdin))
 
+var _ FileWriter = (*LocalWriter)(nil)
+var _ FileWriter = (*RemoteWriter)(nil)
+
 type FileWriter interface {
 	Open(name string) (io.WriteCloser, error)
 	MkdirAll(dir string) error
 	PostRun() error
 	Close() error
+	Stat(name string) (fs.FileInfo, error)
 }
 
 type LocalWriter struct{}
@@ -32,6 +37,10 @@ func (LocalWriter) PostRun() error {
 }
 func (LocalWriter) Close() error {
 	return nil
+}
+
+func (LocalWriter) Stat(name string) (fs.FileInfo, error) {
+	return os.Stat(name)
 }
 
 type RemoteWriter struct {
@@ -82,28 +91,13 @@ func (rw *RemoteWriter) Connect(d *gui.Data) error {
 	return nil
 }
 
-type CloserLog struct {
-	wc   io.WriteCloser
-	name string
-}
-
-func (cl CloserLog) Write(p []byte) (int, error) {
-	return cl.wc.Write(p)
-}
-func (cl CloserLog) Close() error {
-	log.Println("[info] file", cl.name, "write done")
-	return cl.wc.Close()
-}
-
 func (rw *RemoteWriter) Open(name string) (io.WriteCloser, error) {
 	f, err := rw.sftpClient.OpenFile(name, openMode)
 	if err != nil {
 		return nil, err
 	}
 	log.Println("[info] open file", name)
-	return CloserLog{
-		wc: f, name: name,
-	}, nil
+	return f, nil
 }
 
 func (rw *RemoteWriter) MkdirAll(dir string) error {
@@ -140,4 +134,8 @@ func (rw *RemoteWriter) Close() error {
 		return nil
 	}
 	return fmt.Errorf("remote writer close %v %v", err1, err2)
+}
+
+func (rw *RemoteWriter) Stat(name string) (fs.FileInfo, error) {
+	return rw.sftpClient.Stat(name)
 }
