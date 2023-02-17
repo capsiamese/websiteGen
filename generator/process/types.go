@@ -21,6 +21,7 @@ type SiteInfo struct {
 	BannerItems     []BannerItem
 	BannerPost      []*Post
 	Conf            *config.Data
+	BuildTime       time.Time
 
 	IndexTemplateName string
 	PostTemplateName  string

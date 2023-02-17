@@ -14,7 +14,7 @@ func main() {
 		panic(err)
 	}
 	ch := make(chan struct{})
-	process.Generate(data, ch)
+	go process.Generate(data, ch)
 	<-ch
 	rec.Default().Writeln("generate ok")
 }

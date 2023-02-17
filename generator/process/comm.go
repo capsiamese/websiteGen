@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 )
 
 //go:embed assets
@@ -84,6 +85,7 @@ func Generate(data *config.Data, done chan<- struct{}) {
 		},
 		IndexTemplateName: "blueprint",
 		PostTemplateName:  "blueprint",
+		BuildTime:         time.Now(),
 	}
 
 	step := []func() error{
@@ -95,10 +97,12 @@ func Generate(data *config.Data, done chan<- struct{}) {
 	for i, f := range step {
 		if err := f(); err != nil {
 			rec.WritelnF("run step:%d %v", i, err)
+			return
 		}
 	}
 
 	if err := writer.PostRun(); err != nil {
 		rec.WritelnF("post run %v", err)
+		return
 	}
 }
