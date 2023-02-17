@@ -24,7 +24,7 @@ jobs:
       POST_FOLDER: ${{ vars.POST_FOLDER }}
       REMOTE: ${{ vars.REMOTE }}
       USER: ${{ vars.USER }}
-      PASSWORD: ${{ vars.PASSWORD }}
+      PASSWORD: ${{ secrets.PASSWORD }}
     steps:
     - uses: actions/checkout@v3
 
