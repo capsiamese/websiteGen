@@ -22,7 +22,4 @@ jobs:
         go-version: 1.19
 
     - name: Build
-      run: go build -o gen -v generator
-
-    - name: Post
-      run: chmod +x gen && ./gen
+      run: cd generator && go build -o gen -v . && chmod +x gen && ./gen
