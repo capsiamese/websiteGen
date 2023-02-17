@@ -1,12 +1,13 @@
 package main
 
 import (
+	"log"
 	"mdgen/gui"
+	"runtime/debug"
 	"testing"
 )
 
 func TestGenLocal(t *testing.T) {
-	IniTemplate()
 	generate(&gui.Data{
 		Remote:           false,
 		InputFolder:      "./posts",
@@ -14,9 +15,10 @@ func TestGenLocal(t *testing.T) {
 		OutputPostFolder: "posts",
 		GoogleAnalytics:  "AAAAA",
 		BaseURL:          "https://localhost",
-	}, func(i int) {
-		t.Log("progress", i)
-	}, func(err error) {
-		t.Log(err)
-	})
+	}, log.Default(), make(chan struct{}))
+}
+
+func TestStack(t *testing.T) {
+	stk := debug.Stack()
+	t.Log(string(stk))
 }

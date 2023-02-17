@@ -8,36 +8,37 @@ import (
 	"github.com/yuin/goldmark/parser"
 	"gopkg.in/yaml.v3"
 	"html/template"
+	"mdgen/rec"
 	"os"
 	"path"
 	"strings"
+	"time"
 )
-
-func (si *SiteInfo) Error(format string, args ...any) {
-	si.OnErr(fmt.Errorf(format, args...))
-}
 
 func (si *SiteInfo) AddPost(p *Post) {
 	si.Posts = append(si.Posts, p)
 }
 
 func (si *SiteInfo) ScanPostDir() error {
+	rec.Writeln("start scan posts folder ", si.Conf.InputFolder)
+
 	entities, err := os.ReadDir(si.Conf.InputFolder)
 	if err != nil {
 		return err
 	}
+
 	for _, v := range entities {
 		fileName := v.Name()
 		isMarkDown := OneOf(path.Ext(fileName), ".md", ".MD", ".mD", ".Md")
 		if !v.IsDir() && isMarkDown {
 			post, err := GetPost(si.Conf.InputFolder, fileName, v)
 			if err != nil {
-				si.OnErr(fmt.Errorf("get post %s %v", fileName, err))
+				rec.WritelnF("get post %s %v", fileName, err)
 				continue
 			} else if post.Meta.Draft {
+				rec.Writeln("post ", fileName, " is draft ignore")
 				continue
 			} else {
-				si.AddTotal(1)
 				if si.IsBannerPost(fileName) {
 					post.URL = template.URL(fmt.Sprintf("/%s", post.OutputName))
 					si.AddBannerPost(post)
@@ -49,6 +50,9 @@ func (si *SiteInfo) ScanPostDir() error {
 		}
 	}
 	si.SortPost()
+
+	rec.Writeln("scan posts folder ", si.Conf.InputFolder, " done!")
+
 	return nil
 }
 
@@ -62,6 +66,10 @@ var pinyinArgs = &pinyin.Args{
 }
 
 func GetPost(dir, name string, info os.DirEntry) (*Post, error) {
+	fullName := path.Join(dir, name)
+
+	rec.Writeln("start parse post ", fullName)
+
 	post := new(Post)
 	post.FileName = name
 	if i, err := info.Info(); err != nil {
@@ -70,7 +78,7 @@ func GetPost(dir, name string, info os.DirEntry) (*Post, error) {
 		post.fileInfo = i
 	}
 
-	data, err := os.ReadFile(path.Join(dir, name))
+	data, err := os.ReadFile(fullName)
 	if err != nil {
 		return nil, err
 	}
@@ -94,6 +102,8 @@ func GetPost(dir, name string, info os.DirEntry) (*Post, error) {
 	py.WriteString(".html")
 	post.OutputName = py.String()
 
+	rec.Writeln("parse post ", fullName, " done!")
+
 	return post, nil
 }
 
@@ -109,17 +119,19 @@ func SetMeta(ctx parser.Context, postMeta *PostMeta) {
 	// todo: handle error
 	data, err := yaml.Marshal(meta.Get(ctx))
 	if err != nil {
-		fmt.Println(err)
+		rec.Writeln(err)
 		return
 	}
 	err = yaml.Unmarshal(data, postMeta)
 	if err != nil {
-		fmt.Println(err)
+		rec.Writeln(err)
 		return
 	}
 }
 
 func (si *SiteInfo) GenerateIndex() error {
+	rec.Writeln("start generate index.html")
+
 	err := writer.MkdirAll(si.Conf.OutputFolder)
 	if err != nil {
 		return err
@@ -137,21 +149,30 @@ func (si *SiteInfo) GenerateIndex() error {
 	if err != nil {
 		return err
 	}
+	rec.Writeln("generate index.html  done!")
 	return nil
 }
 
 func (si *SiteInfo) GeneratePosts() error {
 	prefix := path.Join(si.Conf.OutputFolder, si.Conf.OutputPostFolder)
+
+	rec.Writeln("start generate posts in ", prefix)
+
 	err := writer.MkdirAll(prefix)
 	if err != nil {
 		return err
 	}
 
 	gen := func(filePath string, s *SiteInfo, p *Post) error {
+		rec.Writeln("start write file to ", filePath)
+
 		outputFileStat, err := writer.Stat(filePath)
 		if err != nil {
-			// todo: handle error
+			rec.WritelnF("get %s stat %v ", filePath, err)
 		} else if p.fileInfo.ModTime().Before(outputFileStat.ModTime()) {
+			rec.WritelnF("markdown modTime:%s exists html modTime:%s ignore",
+				p.fileInfo.ModTime().Format(time.RFC3339),
+				outputFileStat.ModTime().Format(time.RFC3339))
 			return nil
 		}
 
@@ -174,17 +195,17 @@ func (si *SiteInfo) GeneratePosts() error {
 	for _, v := range si.Posts {
 		err := gen(path.Join(prefix, v.OutputName), si, v)
 		if err != nil {
-			si.Error("gen post %s %v", v.OutputName, err)
+			rec.WritelnF("gen post %s %v ", v.OutputName, err)
 		}
-		si.AddComplete(1)
 	}
 	for _, v := range si.BannerPost {
 		err := gen(path.Join(si.Conf.OutputFolder, v.OutputName), si, v)
 		if err != nil {
-			si.Error("gen post %s %v", v.OutputName, err)
+			rec.WritelnF("gen post %s %v ", v.OutputName, err)
 		}
-		si.AddComplete(1)
 	}
+
+	rec.Writeln("generate posts in ", prefix, " done!")
 	return nil
 }
 
@@ -194,16 +215,20 @@ func (si *SiteInfo) WriteStatics() error {
 		return err
 	}
 	for _, v := range entries {
+		targetF := path.Join(si.Conf.OutputFolder, v.Name())
+
+		rec.Writeln("write static file to ", targetF)
+
 		data, _ := static.ReadFile(path.Join("static", v.Name()))
-		file, err := writer.Open(path.Join(si.Conf.OutputFolder, v.Name()))
+		file, err := writer.Open(targetF)
 		if err != nil {
-			si.Error("gen post %s %v", v.Name(), err)
+			rec.WritelnF("gen post %s %v", v.Name(), err)
 			continue
 		}
 		_, err = file.Write(data)
 		file.Close()
 		if err != nil {
-			si.Error("gen post %s %v", v.Name(), err)
+			rec.WritelnF("gen post %s %v", v.Name(), err)
 			continue
 		}
 	}

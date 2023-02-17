@@ -24,11 +24,6 @@ type SiteInfo struct {
 
 	IndexTemplateName string
 	PostTemplateName  string
-
-	complete       int
-	total          int
-	ProgressChange func(n int)
-	OnErr          func(error)
 }
 
 func (si *SiteInfo) AddBannerPost(post *Post) {
@@ -42,20 +37,6 @@ func (si *SiteInfo) IsBannerPost(fileName string) bool {
 		}
 	}
 	return false
-}
-
-func (si *SiteInfo) AddTotal(n int) {
-	si.total += n
-	if si.total != 0 && si.ProgressChange != nil {
-		si.ProgressChange(int(float32(si.complete/si.total) * 100))
-	}
-}
-
-func (si *SiteInfo) AddComplete(n int) {
-	si.complete += n
-	if si.total != 0 && si.ProgressChange != nil {
-		si.ProgressChange(int(float32(si.complete/si.total) * 100))
-	}
 }
 
 func (si *SiteInfo) SortPost() {

@@ -6,3 +6,4 @@ gen/build.exe
 output
 blog.exe
 *.cache
+run.log

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/andlabs/ui"
 	_ "github.com/andlabs/ui/winmanifest"
+	"mdgen/rec"
 )
 
 type Data struct {
@@ -21,7 +22,9 @@ type Data struct {
 	KeyFile    string `env:"KEY_FILE"`
 	KeyStr     string `env:"KEY_STR"`
 
-	Clean bool // todo: impl clean dir
+	Clean     bool // todo: impl clean dir
+	Backup    bool
+	BackupDir string
 }
 
 type App struct {
@@ -32,11 +35,20 @@ type App struct {
 	setupFuncList []func()
 
 	startBtn *ui.Button
-	progress *ui.ProgressBar
+
+	doneCh chan struct{}
+	rc     rec.Recorder
 }
 
-func NewGUI() *App {
-	return &App{}
+func NewGUI(opt ...Option) *App {
+	a := &App{}
+	for _, v := range opt {
+		v(a)
+	}
+	if a.rc == nil {
+		a.rc = rec.Default()
+	}
+	return a
 }
 
 func (a *App) Update(f func()) {
@@ -86,17 +98,22 @@ func (a *App) setup() {
 	a.startBtn = goBtn
 	vBox.Append(goBtn, false)
 
-	pb := ui.NewProgressBar()
-	a.progress = pb
-	vBox.Append(pb, false)
-
 	vBox.Append(a.draftComponent(), false)
+
+	wl, ok := a.rc.(*rec.GUIRec)
+	if ok {
+		wl.Attach(ui.NewMultilineEntry())
+		vBox.Append(wl.Control(), false)
+		wl.QueueMain(a.Update)
+	}
 
 	mw.SetChild(vBox)
 	a.win = mw
 	for _, v := range a.setupFuncList {
 		v()
 	}
+	a.doneCh = make(chan struct{})
+	a.startListen()
 }
 
 func (a *App) Data() *Data {
@@ -109,22 +126,29 @@ func (a *App) OnStartBtnClicked(f func(button *ui.Button)) {
 	})
 }
 
-func (a *App) SetProgress(n int) {
-	a.Update(func() {
-		a.progress.SetValue(n)
-	})
-}
-
 func (a *App) Run() error {
 	return ui.Main(a.setup)
 }
 
-func (a *App) Done() {
-	a.progress.SetValue(0)
-	a.startBtn.Enable()
-	a.Msg("完成!")
-}
-
 func (a *App) SetupF(f func()) {
 	a.setupFuncList = append(a.setupFuncList, f)
+}
+
+func (a *App) DoneChan() chan<- struct{} {
+	return a.doneCh
+}
+
+func (a *App) startListen() {
+	go func(app *App) {
+		for {
+			select {
+			case <-app.doneCh:
+				app.Update(func() {
+					app.WriteCache()
+					app.startBtn.Enable()
+					app.Msg("完成!")
+				})
+			}
+		}
+	}(a)
 }

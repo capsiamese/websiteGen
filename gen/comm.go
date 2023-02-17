@@ -2,10 +2,10 @@ package main
 
 import (
 	"embed"
-	"fmt"
 	"github.com/Masterminds/sprig"
 	"html/template"
 	"mdgen/gui"
+	"mdgen/rec"
 	"os"
 	"path"
 	"strings"
@@ -54,30 +54,34 @@ const (
 	openMode = os.O_TRUNC | os.O_CREATE | os.O_RDWR
 )
 
-func generate(data *gui.Data, change func(int), onErr func(error)) {
+func generate(data *gui.Data, done chan<- struct{}) {
+	defer func() {
+		done <- struct{}{}
+	}()
+
 	if data.Remote {
 		r := NewRemoteWriter()
 		if err := r.Connect(data); err != nil {
-			onErr(fmt.Errorf("[fatal] connect to remote %v", err))
+			rec.WritelnF("[fatal] connect to remote %v", err)
 			return
 		}
 		writer = r
 	} else {
 		writer = LocalWriter{}
 	}
+	rec.Writeln("*****************************************")
+	rec.WritelnF("start generate use remote %v", data.Remote)
 
 	s := &SiteInfo{
 		SiteTitle:       "siamese",
 		GoogleAnalytics: data.GoogleAnalytics,
-		BaseURL:         template.URL(strings.TrimRight(data.BaseURL, "/")),
 		Conf:            data,
+		BaseURL:         template.URL(strings.TrimRight(data.BaseURL, "/")),
 		BannerItems: []BannerItem{
 			{URL: "/index.html", Target: "_self", Name: "Home"},
 			{URL: "/about.html", Target: "_self", Name: "About", FileName: "about.md"},
 			{URL: "/ref.html", Target: "_blank", Name: "Ref", FileName: "ref.md"},
 		},
-		ProgressChange:    change,
-		OnErr:             onErr,
 		IndexTemplateName: "blueprint",
 		PostTemplateName:  "blueprint",
 	}
@@ -90,11 +94,11 @@ func generate(data *gui.Data, change func(int), onErr func(error)) {
 	}
 	for i, f := range step {
 		if err := f(); err != nil {
-			onErr(fmt.Errorf("run step:%d %v", i, err))
+			rec.WritelnF("run step:%d %v", i, err)
 		}
 	}
 
 	if err := writer.PostRun(); err != nil {
-		onErr(fmt.Errorf("post run %v", err))
+		rec.WritelnF("post run %v", err)
 	}
 }

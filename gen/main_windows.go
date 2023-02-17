@@ -5,26 +5,26 @@ import (
 	"fmt"
 	"github.com/andlabs/ui"
 	"mdgen/gui"
+	"mdgen/rec"
 )
 
 // gui
 func main() {
-	app := gui.NewGUI()
+	recorder := rec.NewFileRec("run.log")
+
+	app := gui.NewGUI(gui.WithLog(recorder))
 	app.ReadCache()
 
 	app.OnStartBtnClicked(func(button *ui.Button) {
+		if !button.Enabled() {
+			return
+		}
 		button.Disable()
-		app.SetProgress(0)
 
-		generate(app.Data(), app.SetProgress, func(err error) {})
-		app.WriteCache()
-
-		app.Done()
+		go generate(app.Data(), app.DoneChan())
 	})
 
-	app.SetupF(func() {
-
-	})
+	app.SetupF(func() {})
 
 	err := app.Run()
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"log"
 	"mdgen/gui"
+	"mdgen/rec"
 	"os"
 )
 
@@ -57,18 +58,18 @@ func (rw *RemoteWriter) tryAuthMethod(keyStr, keyPath, password string) []ssh.Au
 	if keyStr != "" {
 		signer, parseKeyErr := ssh.ParsePrivateKey([]byte(keyStr))
 		if parseKeyErr != nil {
-			log.Println("[warning] read ssh key from", keyPath, parseKeyErr)
+			rec.Writeln("[warning] read ssh key from", keyPath, parseKeyErr)
 		} else {
 			return []ssh.AuthMethod{ssh.PublicKeys(signer)}
 		}
 	}
 	data, keyPathErr := os.ReadFile(keyPath)
 	if keyPathErr != nil {
-		log.Println("[warning] read ssh key from", keyPath, keyPathErr)
+		rec.Writeln("[warning] read ssh key from", keyPath, keyPathErr)
 	} else {
 		signer, parseKeyErr := ssh.ParsePrivateKey(data)
 		if parseKeyErr != nil {
-			log.Println("[warning] parse ssh key", keyPath, parseKeyErr)
+			rec.Writeln("[warning] parse ssh key", keyPath, parseKeyErr)
 		} else {
 			return []ssh.AuthMethod{ssh.PublicKeys(signer)}
 		}
@@ -104,12 +105,12 @@ func (rw *RemoteWriter) Open(name string) (io.WriteCloser, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Println("[info] open file", name)
+	rec.Writeln("[info] open file", name)
 	return f, nil
 }
 
 func (rw *RemoteWriter) MkdirAll(dir string) error {
-	log.Println("[info] mkdir all", dir)
+	rec.Writeln("[info] mkdir all", dir)
 	return rw.sftpClient.MkdirAll(dir)
 }
 
