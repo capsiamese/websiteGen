@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"mdgen/gui"
 	"runtime/debug"
 	"testing"
@@ -15,7 +14,7 @@ func TestGenLocal(t *testing.T) {
 		OutputPostFolder: "posts",
 		GoogleAnalytics:  "AAAAA",
 		BaseURL:          "https://localhost",
-	}, log.Default(), make(chan struct{}))
+	}, make(chan struct{}))
 }
 
 func TestStack(t *testing.T) {

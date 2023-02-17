@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"github.com/caarlos0/env/v7"
 	"mdgen/gui"
+	"mdgen/rec"
 )
 
 // cli
@@ -13,7 +13,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	generate(data, nil, func(err error) {
-		fmt.Println(err)
-	})
+	ch := make(chan struct{})
+	generate(data, ch)
+	<-ch
+	rec.Default().Writeln("generate ok")
 }
