@@ -32,5 +32,4 @@ func (def) Writeln(i ...any) {
 }
 func (def) WritelnF(f string, i ...any) {
 	log.Printf(f, i...)
-	log.Println()
 }
