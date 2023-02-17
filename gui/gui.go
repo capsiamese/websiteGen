@@ -81,7 +81,7 @@ func (a *App) setup() {
 
 	vBox.Append(a.draftComponent(), false)
 
-	wl, ok := a.rc.(*rec.GUIRec)
+	wl, ok := a.rc.(*GUIRec)
 	if ok {
 		wl.Attach(ui.NewMultilineEntry())
 		vBox.Append(wl.Control(), false)

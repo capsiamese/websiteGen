@@ -5,7 +5,6 @@ go 1.19
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/alecthomas/chroma/v2 v2.5.0
-	github.com/andlabs/ui v0.0.0-20200610043537-70a69d6ae31e
 	github.com/caarlos0/env v3.5.0+incompatible
 	github.com/mozillazg/go-pinyin v0.19.0
 	github.com/pkg/sftp v1.13.5

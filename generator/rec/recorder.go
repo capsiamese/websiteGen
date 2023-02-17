@@ -21,6 +21,10 @@ func Default() Recorder {
 	return defaultRec
 }
 
+func SetDefault(r Recorder) {
+	defaultRec = r
+}
+
 type def struct{}
 
 func (def) Writeln(i ...any) {

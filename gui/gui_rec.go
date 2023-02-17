@@ -1,15 +1,16 @@
-package rec
+package main
 
 import (
 	"fmt"
+	"generator/rec"
 	"github.com/andlabs/ui"
 	"log"
 	"time"
 )
 
-func NewGUIRec() *GUIRec {
+func NewGUIRec() *GUIRec { // can not resize widget, so not use
 	r := &GUIRec{}
-	defaultRec = r
+	rec.SetDefault(r)
 	return r
 }
 
