@@ -87,6 +87,7 @@ func (rw *RemoteWriter) Connect(d *config.Data) error {
 
 	addr := fmt.Sprintf("%s:%s", d.RemoteAddr, d.RemotePort)
 	rec.Writeln("ssh dial addr:", addr)
+	rec.Writeln("password len:", len(d.Password))
 	sshClient, err := ssh.Dial("tcp", addr, &cfg)
 	if err != nil {
 		return err
