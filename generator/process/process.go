@@ -1,14 +1,14 @@
-package main
+package process
 
 import (
 	"bytes"
 	"fmt"
+	"generator/rec"
 	"github.com/mozillazg/go-pinyin"
 	meta "github.com/yuin/goldmark-meta"
 	"github.com/yuin/goldmark/parser"
 	"gopkg.in/yaml.v3"
 	"html/template"
-	"mdgen/rec"
 	"os"
 	"path"
 	"strings"

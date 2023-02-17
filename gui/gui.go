@@ -1,35 +1,16 @@
-package gui
+package main
 
 import (
 	"fmt"
+	"generator/config"
+	"generator/rec"
 	"github.com/andlabs/ui"
 	_ "github.com/andlabs/ui/winmanifest"
-	"mdgen/rec"
 )
-
-type Data struct {
-	Remote           bool   `env:"REMOTE"`
-	InputFolder      string `env:"INPUT_FOLDER"`
-	OutputFolder     string `env:"OUTPUT_FOLDER"`
-	GoogleAnalytics  string `env:"GA"`
-	BaseURL          string `env:"BASE_URL"`
-	OutputPostFolder string `env:"POST_FOLDER"`
-
-	RemoteAddr string `env:"ADDR"`
-	RemotePort string `env:"PORT"`
-	User       string `env:"USER"`
-	Password   string `env:"PASSWORD"`
-	KeyFile    string `env:"KEY_FILE"`
-	KeyStr     string `env:"KEY_STR"`
-
-	Clean     bool // todo: impl clean dir
-	Backup    bool
-	BackupDir string
-}
 
 type App struct {
 	win    *ui.Window
-	data   Data
+	data   config.Data
 	remote ui.Control
 
 	setupFuncList []func()
@@ -116,7 +97,7 @@ func (a *App) setup() {
 	a.startListen()
 }
 
-func (a *App) Data() *Data {
+func (a *App) Data() *config.Data {
 	return &a.data
 }
 

@@ -1,11 +1,11 @@
-package main
+package process
 
 import (
 	"embed"
+	"generator/config"
+	"generator/rec"
 	"github.com/Masterminds/sprig"
 	"html/template"
-	"mdgen/gui"
-	"mdgen/rec"
 	"os"
 	"path"
 	"strings"
@@ -54,7 +54,7 @@ const (
 	openMode = os.O_TRUNC | os.O_CREATE | os.O_RDWR
 )
 
-func generate(data *gui.Data, done chan<- struct{}) {
+func Generate(data *config.Data, done chan<- struct{}) {
 	defer func() {
 		done <- struct{}{}
 	}()

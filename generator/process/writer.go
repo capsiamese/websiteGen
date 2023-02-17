@@ -1,14 +1,14 @@
-package main
+package process
 
 import (
 	"fmt"
+	"generator/config"
+	"generator/rec"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 	"io"
 	"io/fs"
 	"log"
-	"mdgen/gui"
-	"mdgen/rec"
 	"os"
 )
 
@@ -79,7 +79,7 @@ func (rw *RemoteWriter) tryAuthMethod(keyStr, keyPath, password string) []ssh.Au
 	})}
 }
 
-func (rw *RemoteWriter) Connect(d *gui.Data) error {
+func (rw *RemoteWriter) Connect(d *config.Data) error {
 	var cfg ssh.ClientConfig
 	cfg.Auth = rw.tryAuthMethod(d.KeyStr, d.KeyFile, d.Password)
 	cfg.User = d.User

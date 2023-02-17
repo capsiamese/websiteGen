@@ -1,20 +1,20 @@
 package main
 
 import (
-	"github.com/caarlos0/env/v7"
-	"mdgen/gui"
-	"mdgen/rec"
+	"generator/config"
+	"generator/process"
+	"generator/rec"
+	"github.com/caarlos0/env"
 )
 
-// cli
 func main() {
-	data := new(gui.Data)
+	data := new(config.Data)
 	err := env.Parse(data)
 	if err != nil {
 		panic(err)
 	}
 	ch := make(chan struct{})
-	generate(data, ch)
+	process.Generate(data, ch)
 	<-ch
 	rec.Default().Writeln("generate ok")
 }

@@ -1,18 +1,16 @@
 package main
 
 import (
-	_ "embed"
 	"fmt"
+	"generator/process"
+	"generator/rec"
 	"github.com/andlabs/ui"
-	"mdgen/gui"
-	"mdgen/rec"
 )
 
-// gui
 func main() {
 	recorder := rec.NewFileRec("run.log")
 
-	app := gui.NewGUI(gui.WithLog(recorder))
+	app := NewGUI(WithLog(recorder))
 	app.ReadCache()
 
 	app.OnStartBtnClicked(func(button *ui.Button) {
@@ -21,7 +19,7 @@ func main() {
 		}
 		button.Disable()
 
-		go generate(app.Data(), app.DoneChan())
+		go process.Generate(app.Data(), app.DoneChan())
 	})
 
 	app.SetupF(func() {})

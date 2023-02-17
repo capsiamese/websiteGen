@@ -1,7 +1,7 @@
-package gui
+package main
 
 import (
-	"mdgen/rec"
+	"generator/rec"
 )
 
 type Option func(a *App)

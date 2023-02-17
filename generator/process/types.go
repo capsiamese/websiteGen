@@ -1,6 +1,7 @@
-package main
+package process
 
 import (
+	"generator/config"
 	"github.com/alecthomas/chroma/v2/formatters/html"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
@@ -8,7 +9,6 @@ import (
 	"go.abhg.dev/goldmark/mermaid"
 	"html/template"
 	"io/fs"
-	"mdgen/gui"
 	"sort"
 	"time"
 )
@@ -20,7 +20,7 @@ type SiteInfo struct {
 	Posts           []*Post
 	BannerItems     []BannerItem
 	BannerPost      []*Post
-	Conf            *gui.Data
+	Conf            *config.Data
 
 	IndexTemplateName string
 	PostTemplateName  string

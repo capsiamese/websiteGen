@@ -1,9 +1,5 @@
-gen/output/*
-gen/input
-gen/build.exe
 .idea
-
 output
-blog.exe
+*.exe
 *.cache
 run.log

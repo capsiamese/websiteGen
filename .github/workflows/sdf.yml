@@ -22,4 +22,7 @@ jobs:
         go-version: 1.19
 
     - name: Build
-      run: cd gen && go build -v && ./mdgen
+      run: go build -v generator
+
+    - name: Post
+      run: ./generator
