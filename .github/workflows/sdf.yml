@@ -20,7 +20,7 @@ jobs:
       GA: ${{ vars.GA }}
       INPUT_FOLDER: ${{ vars.INPUT_FOLDER }}
       OUTPUT_FOLDER: ${{ vars.INPUT_FOLDER }}
-      PORT: ${{ vars.INPUT_FOLDER }}
+      PORT: ${{ vars.PORT }}
       POST_FOLDER: ${{ vars.POST_FOLDER }}
       REMOTE: ${{ vars.REMOTE }}
       USER: ${{ vars.USER }}
