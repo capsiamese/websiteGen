@@ -19,7 +19,7 @@ jobs:
       BASE_URL: ${{ vars.BASE_URL }}
       GA: ${{ vars.GA }}
       INPUT_FOLDER: ${{ vars.INPUT_FOLDER }}
-      OUTPUT_FOLDER: ${{ vars.INPUT_FOLDER }}
+      OUTPUT_FOLDER: ${{ vars.OUTPUT_FOLDER }}
       PORT: ${{ vars.PORT }}
       POST_FOLDER: ${{ vars.POST_FOLDER }}
       REMOTE: ${{ vars.REMOTE }}
