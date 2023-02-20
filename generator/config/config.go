@@ -15,7 +15,8 @@ type Data struct {
 	KeyFile    string `env:"KEY_FILE"`
 	KeyStr     string `env:"KEY_STR"`
 
-	Clean     bool // todo: impl clean dir
-	Backup    bool
-	BackupDir string
+	BuildAllPosts bool `env:"BUILD_ALL" envDefault:"true"`
+	Clean         bool // todo: impl clean dir
+	Backup        bool
+	BackupDir     string
 }

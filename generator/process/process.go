@@ -169,7 +169,7 @@ func (si *SiteInfo) GeneratePosts() error {
 		outputFileStat, err := writer.Stat(filePath)
 		if err != nil {
 			rec.WritelnF("get %s stat %v ", filePath, err)
-		} else if p.fileInfo.ModTime().Before(outputFileStat.ModTime()) {
+		} else if !si.Conf.BuildAllPosts && p.fileInfo.ModTime().Before(outputFileStat.ModTime()) {
 			rec.WritelnF("markdown modTime:%s exists html modTime:%s ignore",
 				p.fileInfo.ModTime().Format(time.RFC3339),
 				outputFileStat.ModTime().Format(time.RFC3339))
