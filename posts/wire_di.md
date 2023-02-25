@@ -1,7 +1,7 @@
 ---
 title: "wire依赖注入学习"
 date: 2023-02-25T11:33:41+08:00
-draft: true
+draft: false
 tags: []
 ---
 
