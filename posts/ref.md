@@ -28,6 +28,7 @@ draft: false
 * 无头浏览器 [webloop](https://github.com/sourcegraph/webloop)
 * 分布式存储系统 [seaweedfs](https://github.com/seaweedfs/seaweedfs)
 * goquery [goquery](https://github.com/PuerkitoBio/goquery)
+* colly爬虫库 [colly](https://github.com/gocolly/colly)
 * windowsGUI [walk](https://github.com/lxn/walk)
 * 压缩库 [compress](https://github.com/klauspost/compress)
 * 压缩解压缩库 [archiver](https://github.com/mholt/archiver)
