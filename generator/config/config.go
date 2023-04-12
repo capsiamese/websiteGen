@@ -19,4 +19,5 @@ type Data struct {
 	Clean         bool // todo: impl clean dir
 	Backup        bool
 	BackupDir     string
+	GithubToken   string `env:"GITHUB_TOKEN"`
 }
