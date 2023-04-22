@@ -69,6 +69,7 @@ func (i *IssueScanner) Scan(ctx context.Context) ([]string, error) {
 TODO: 1.增加扫描文件系统和issues的通用接口
 TODO: 2.支持特殊文件, 例如About, References等
 TODO: 3.迁移本仓库到blog仓库中
+TODO: 4.整理出一个通用的Post结构给接口用
 
 blog仓库中目录结构
 - templates
